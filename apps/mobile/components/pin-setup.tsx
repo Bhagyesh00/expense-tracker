@@ -314,7 +314,7 @@ export default function PinSetup({ onComplete, onCancel, title }: PinSetupProps)
 
 // ---- Styles ----
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create<any>({
   container: {
     flex: 1,
     alignItems: "center",

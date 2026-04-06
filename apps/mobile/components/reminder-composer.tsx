@@ -73,7 +73,7 @@ export default function ReminderComposer({
     }
   }
 
-  const shareOptions = [
+  const shareOptions: { id: string; label: string; icon: string; bg: string; textColor: string; disabled?: boolean }[] = [
     {
       id: "general",
       label: "Share",

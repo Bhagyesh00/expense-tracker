@@ -552,7 +552,7 @@ export default function CategoriesScreen() {
         className="flex-1"
         contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 12, paddingBottom: 100 }}
         data={listData}
-        keyExtractor={(item) => ("id" in item ? item.id : item.id)}
+        keyExtractor={(item) => ("id" in item ? (item as any).id : (item as any).id)}
         renderItem={({ item, index }) => {
           if ("type" in item && item.type === "header") {
             return (

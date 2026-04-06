@@ -190,7 +190,7 @@ export function NotificationBell({ userId, className }: NotificationBellProps) {
         .from("notifications")
         .select("*", { count: "exact", head: true })
         .eq("user_id", userId)
-        .is("read_at", null);
+        .eq("is_read", false);
       if (error) throw error;
       return count ?? 0;
     },
@@ -204,7 +204,7 @@ export function NotificationBell({ userId, className }: NotificationBellProps) {
     mutationFn: async (id: string) => {
       const { error } = await client
         .from("notifications")
-        .update({ read_at: new Date().toISOString() } as any)
+        .update({ is_read: true } as any)
         .eq("id", id);
       if (error) throw error;
     },
@@ -218,9 +218,9 @@ export function NotificationBell({ userId, className }: NotificationBellProps) {
     mutationFn: async () => {
       const { error } = await client
         .from("notifications")
-        .update({ read_at: new Date().toISOString() } as any)
+        .update({ is_read: true } as any)
         .eq("user_id", userId)
-        .is("read_at", null);
+        .eq("is_read", false);
       if (error) throw error;
     },
     onSuccess: () => {

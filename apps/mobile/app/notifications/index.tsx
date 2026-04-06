@@ -518,7 +518,7 @@ export default function NotificationsScreen() {
       if (error || !data || data.length === 0) {
         setNotifications(MOCK_NOTIFICATIONS);
       } else {
-        setNotifications(data as AppNotification[]);
+        setNotifications(data as unknown as AppNotification[]);
       }
     } catch {
       setNotifications(MOCK_NOTIFICATIONS);
@@ -539,7 +539,7 @@ export default function NotificationsScreen() {
       if (user) {
         await supabase
           .from("notifications")
-          .update({ read_at: now })
+          .update({ is_read: true } as any)
           .eq("user_id", user.id)
           .is("read_at", null);
       }
@@ -557,7 +557,7 @@ export default function NotificationsScreen() {
     try {
       await supabase
         .from("notifications")
-        .update({ read_at: now })
+        .update({ is_read: true } as any)
         .eq("id", id);
     } catch {
       // silently fail

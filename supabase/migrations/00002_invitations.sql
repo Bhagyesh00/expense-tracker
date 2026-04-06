@@ -115,15 +115,15 @@ CREATE POLICY "workspace_admins_can_update_invitations"
     )
   );
 
--- Users can view their own invitations (by email matching their profile)
+-- Users can view their own invitations (by email matching auth.users)
 CREATE POLICY "users_can_view_own_invitations"
   ON invitations
   FOR SELECT
   USING (
     email = (
-      SELECT p.email
-      FROM profiles p
-      WHERE p.id = auth.uid()
+      SELECT u.email
+      FROM auth.users u
+      WHERE u.id = auth.uid()
     )
   );
 

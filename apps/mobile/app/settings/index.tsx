@@ -1050,7 +1050,6 @@ export default function SettingsScreen() {
                 label="Sign Out"
                 onPress={handleSignOut}
                 destructive
-                showChevron={false}
                 isDark={isDark}
               />
               <Divider isDark={isDark} />
@@ -1059,7 +1058,6 @@ export default function SettingsScreen() {
                 subtitle="Permanently remove all data"
                 onPress={handleDeleteAccount}
                 destructive
-                showChevron={false}
                 isDark={isDark}
               />
             </Card>

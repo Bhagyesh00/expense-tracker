@@ -401,7 +401,7 @@ export default function DataPrivacyScreen() {
       // Fetch user's data
       const [expensesRes, categoriesRes, budgetsRes] = await Promise.allSettled([
         supabase.from("expenses").select("*").eq("user_id", user?.id ?? "").limit(1000),
-        supabase.from("categories").select("*").eq("user_id", user?.id ?? ""),
+        supabase.from("categories").select("id, name, icon, color, type"),
         supabase.from("budgets").select("*").eq("user_id", user?.id ?? ""),
       ]);
 

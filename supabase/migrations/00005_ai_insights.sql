@@ -98,9 +98,9 @@ CREATE INDEX IF NOT EXISTS idx_ai_cache_query_hash
     ON public.ai_cache(query_hash);
 
 -- Re-create expires_at index (already exists, ensure it covers new usage)
+-- Note: no partial predicate — now() is VOLATILE and not allowed in index predicates
 CREATE INDEX IF NOT EXISTS idx_ai_cache_expires_at_v2
-    ON public.ai_cache(expires_at)
-    WHERE expires_at < now() + INTERVAL '2 hours';
+    ON public.ai_cache(expires_at);
 
 -- =============================================================================
 -- RLS: Enable and configure Row Level Security

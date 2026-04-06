@@ -220,10 +220,10 @@ export default function BankTransactionsScreen() {
       <TransactionMatchSheet
         ref={bottomSheetRef}
         snapPoints={snapPoints}
-        transaction={selectedTransaction}
+        transaction={selectedTransaction as any}
         matches={potentialMatches}
         onMatchConfirm={handleMatchConfirm}
-        onCreateExpense={handleCreateExpense}
+        onCreateExpense={handleCreateExpense as any}
         onDismiss={handleDismiss}
       />
     </SafeAreaView>

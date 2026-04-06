@@ -44,14 +44,14 @@ function Spinner({ size = 'md', color = '#6366f1', className }: SpinnerProps) {
             size === 'md' && 'h-6 w-6',
             size === 'lg' && 'h-9 w-9',
           )}
-          // @ts-expect-error -- web-only style for animation
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           style={{
             borderTopColor: color,
             animationName: 'spin',
             animationDuration: '700ms',
             animationIterationCount: 'infinite',
             animationTimingFunction: 'linear',
-          }}
+          } as any}
         />
       </View>
     );

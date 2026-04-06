@@ -145,7 +145,7 @@ export async function getInsights(workspaceId: string): Promise<AIInsight[]> {
 export async function dismissAnomaly(anomalyId: string): Promise<void> {
   const { error } = await supabase
     .from("anomalies")
-    .update({ dismissed: true, dismissed_at: new Date().toISOString() })
+    .update({ dismissed: true, dismissed_at: new Date().toISOString() } as unknown as never)
     .eq("id", anomalyId);
 
   if (error) {

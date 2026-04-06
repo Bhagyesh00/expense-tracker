@@ -138,7 +138,7 @@ async function replayMutation(mutation: QueuedMutation): Promise<boolean> {
 
     switch (mutation.operation) {
       case "insert":
-        query = supabase.from(mutation.table).insert(mutation.data);
+        query = supabase.from(mutation.table).insert(mutation.data as any);
         break;
 
       case "update":
@@ -148,7 +148,7 @@ async function replayMutation(mutation: QueuedMutation): Promise<boolean> {
         }
         query = supabase
           .from(mutation.table)
-          .update(mutation.data)
+          .update(mutation.data as unknown as never)
           .eq(mutation.matchColumn, mutation.matchValue);
         break;
 

@@ -1,5 +1,5 @@
 {
-  "extends": "../../config/typescript/react-native.json",
+  "extends": "../../packages/config/typescript/react-native.json",
   "compilerOptions": {
     "strict": true,
     "paths": {

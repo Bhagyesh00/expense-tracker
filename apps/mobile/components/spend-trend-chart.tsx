@@ -94,7 +94,7 @@ export default function SpendTrendChart({
   const hasExpenses = expenseData.some((v) => v > 0);
   const hasIncome = incomeData.some((v) => v > 0);
 
-  const datasets = [];
+  const datasets: Array<{ data: number[]; color: (opacity?: number) => string; strokeWidth: number }> = [];
   if (hasExpenses || !hasIncome) {
     datasets.push({
       data: expenseData.length > 0 ? expenseData : [0],
@@ -163,7 +163,7 @@ export default function SpendTrendChart({
         <LineChart
           data={{
             labels,
-            datasets,
+            datasets: datasets as any,
           }}
           width={chartWidth}
           height={220}
@@ -181,7 +181,7 @@ export default function SpendTrendChart({
               y: pointData.y,
               value: pointData.value,
               index: pointData.index,
-              datasetIndex: pointData.dataset ? datasets.indexOf(pointData.dataset) : 0,
+              datasetIndex: pointData.dataset ? (datasets as any[]).indexOf(pointData.dataset) : 0,
             });
             setTimeout(() => setTooltip(null), 2500);
           }}

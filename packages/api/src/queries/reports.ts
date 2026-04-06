@@ -95,13 +95,13 @@ export async function getMonthlySummary(
     .from('expenses')
     .select('type, amount, category_id, categories(name, color)')
     .eq('workspace_id', workspaceId)
-    .gte('date', startDate)
-    .lte('date', endDate)
+    .gte('expense_date', startDate)
+    .lte('expense_date', endDate)
     .is('deleted_at', null);
 
   if (error) throw error;
 
-  const expenses = (data ?? []) as {
+  const expenses = (data ?? []) as unknown as {
     type: string;
     amount: number;
     category_id: string;
@@ -176,13 +176,13 @@ export async function getCategoryBreakdown(
     .select('amount, category_id, subcategory_id, categories(id, name, icon, color)')
     .eq('workspace_id', workspaceId)
     .eq('type', 'expense')
-    .gte('date', startDate)
-    .lte('date', endDate)
+    .gte('expense_date', startDate)
+    .lte('expense_date', endDate)
     .is('deleted_at', null);
 
   if (error) throw error;
 
-  const expenses = (data ?? []) as {
+  const expenses = (data ?? []) as unknown as {
     amount: number;
     category_id: string;
     subcategory_id: string | null;
@@ -280,16 +280,16 @@ export async function getSpendTrend(
 ): Promise<SpendTrendPoint[]> {
   const { data, error } = await client
     .from('expenses')
-    .select('type, amount, date')
+    .select('type, amount, expense_date')
     .eq('workspace_id', workspaceId)
-    .gte('date', startDate)
-    .lte('date', endDate)
+    .gte('expense_date', startDate)
+    .lte('expense_date', endDate)
     .is('deleted_at', null)
-    .order('date', { ascending: true });
+    .order('expense_date', { ascending: true });
 
   if (error) throw error;
 
-  const expenses = (data ?? []) as { type: string; amount: number; date: string }[];
+  const expenses = (data ?? []) as { type: string; amount: number; expense_date: string }[];
 
   const buckets = new Map<string, SpendTrendPoint>();
 
@@ -327,7 +327,7 @@ export async function getSpendTrend(
 
   // Fill buckets
   for (const expense of expenses) {
-    const d = new Date(expense.date);
+    const d = new Date(expense.expense_date);
     let key: string;
 
     if (granularity === 'daily') {
@@ -386,8 +386,8 @@ export async function getBudgetVsActual(
     .select('category_id, amount')
     .eq('workspace_id', workspaceId)
     .eq('type', 'expense')
-    .gte('date', periodDates.start)
-    .lte('date', periodDates.end)
+    .gte('expense_date', periodDates.start)
+    .lte('expense_date', periodDates.end)
     .is('deleted_at', null);
 
   if (spendingError) throw spendingError;
@@ -402,7 +402,7 @@ export async function getBudgetVsActual(
     {},
   );
 
-  return (budgets ?? []).map((budget) => {
+  return ((budgets ?? []) as unknown as any[]).map((budget: any) => {
     const cat = budget.categories as { id: string; name: string; icon: string | null; color: string | null } | null;
     const actualAmount = spendingByCategory[budget.category_id as string] ?? 0;
     const budgetAmount = budget.amount as number;
@@ -437,15 +437,15 @@ export async function getIncomeVsExpense(
 
   const { data, error } = await client
     .from('expenses')
-    .select('type, amount, date')
+    .select('type, amount, expense_date')
     .eq('workspace_id', workspaceId)
-    .gte('date', startDate.toISOString())
+    .gte('expense_date', startDate.toISOString())
     .is('deleted_at', null)
-    .order('date', { ascending: true });
+    .order('expense_date', { ascending: true });
 
   if (error) throw error;
 
-  const expenses = (data ?? []) as { type: string; amount: number; date: string }[];
+  const expenses = (data ?? []) as { type: string; amount: number; expense_date: string }[];
 
   // Initialize all months
   const monthlyData = new Map<string, IncomeVsExpenseMonth>();
@@ -457,7 +457,7 @@ export async function getIncomeVsExpense(
   }
 
   for (const exp of expenses) {
-    const d = new Date(exp.date);
+    const d = new Date(exp.expense_date);
     const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
     const point = monthlyData.get(key);
     if (point) {
@@ -491,16 +491,16 @@ export async function getDailyHeatmap(
 
   const { data, error } = await client
     .from('expenses')
-    .select('amount, date')
+    .select('amount, expense_date')
     .eq('workspace_id', workspaceId)
     .eq('type', 'expense')
-    .gte('date', startDate)
-    .lte('date', endDate)
+    .gte('expense_date', startDate)
+    .lte('expense_date', endDate)
     .is('deleted_at', null);
 
   if (error) throw error;
 
-  const expenses = (data ?? []) as { amount: number; date: string }[];
+  const expenses = (data ?? []) as { amount: number; expense_date: string }[];
 
   // Aggregate by date
   const dailyMap = new Map<string, { amount: number; count: number }>();
@@ -513,7 +513,7 @@ export async function getDailyHeatmap(
   }
 
   for (const exp of expenses) {
-    const dateKey = exp.date.split('T')[0]!;
+    const dateKey = exp.expense_date.split('T')[0]!;
     const existing = dailyMap.get(dateKey);
     if (existing) {
       existing.amount += exp.amount;
@@ -565,13 +565,13 @@ export async function getTopCategories(
     .select('amount, category_id, categories(id, name, icon, color)')
     .eq('workspace_id', workspaceId)
     .eq('type', 'expense')
-    .gte('date', startDate)
-    .lte('date', endDate)
+    .gte('expense_date', startDate)
+    .lte('expense_date', endDate)
     .is('deleted_at', null);
 
   if (error) throw error;
 
-  const expenses = (data ?? []) as {
+  const expenses = (data ?? []) as unknown as {
     amount: number;
     category_id: string;
     categories: { id: string; name: string; icon: string | null; color: string | null } | null;
@@ -636,19 +636,19 @@ export async function getYearOverYearComparison(
   const [result1, result2] = await Promise.all([
     client
       .from('expenses')
-      .select('amount, date')
+      .select('amount, expense_date')
       .eq('workspace_id', workspaceId)
       .eq('type', 'expense')
-      .gte('date', start1)
-      .lte('date', end1)
+      .gte('expense_date', start1)
+      .lte('expense_date', end1)
       .is('deleted_at', null),
     client
       .from('expenses')
-      .select('amount, date')
+      .select('amount, expense_date')
       .eq('workspace_id', workspaceId)
       .eq('type', 'expense')
-      .gte('date', start2)
-      .lte('date', end2)
+      .gte('expense_date', start2)
+      .lte('expense_date', end2)
       .is('deleted_at', null),
   ]);
 
@@ -659,13 +659,13 @@ export async function getYearOverYearComparison(
   const year1Monthly = new Array<number>(12).fill(0);
   const year2Monthly = new Array<number>(12).fill(0);
 
-  for (const exp of (result1.data ?? []) as { amount: number; date: string }[]) {
-    const monthIdx = new Date(exp.date).getMonth();
+  for (const exp of (result1.data ?? []) as unknown as { amount: number; expense_date: string }[]) {
+    const monthIdx = new Date(exp.expense_date).getMonth();
     year1Monthly[monthIdx] += exp.amount;
   }
 
-  for (const exp of (result2.data ?? []) as { amount: number; date: string }[]) {
-    const monthIdx = new Date(exp.date).getMonth();
+  for (const exp of (result2.data ?? []) as unknown as { amount: number; expense_date: string }[]) {
+    const monthIdx = new Date(exp.expense_date).getMonth();
     year2Monthly[monthIdx] += exp.amount;
   }
 
@@ -688,16 +688,16 @@ export async function getContactOutstandingReport(
   // Fetch all non-settled pending payments with contact info
   const { data, error } = await client
     .from('pending_payments')
-    .select('contact_id, direction, amount, contacts(id, name, phone)')
+    .select('contact_id, direction, total_amount, contacts(id, name, phone)')
     .eq('workspace_id', workspaceId)
     .in('status', ['pending', 'partially_paid', 'overdue']);
 
   if (error) throw error;
 
-  const payments = (data ?? []) as {
+  const payments = (data ?? []) as unknown as {
     contact_id: string;
     direction: string;
-    amount: number;
+    total_amount: number;
     contacts: { id: string; name: string; phone: string | null } | null;
   }[];
 
@@ -708,7 +708,7 @@ export async function getContactOutstandingReport(
     if (!contactId) continue;
 
     const existing = contactMap.get(contactId);
-    const amount = payment.amount;
+    const amount = payment.total_amount;
 
     if (existing) {
       if (payment.direction === 'give') {

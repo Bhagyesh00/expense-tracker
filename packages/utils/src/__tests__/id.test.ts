@@ -70,8 +70,12 @@ describe('generateSlug', () => {
 
   it('produces URL-safe output', () => {
     const slug = generateSlug('Café & Restaurant #1');
-    // Should not contain &, #, or accented chars (stripped by regex)
-    expect(slug).toMatch(/^[a-z0-9-]+$/);
+    // Should not contain &, # or spaces; nanoid suffix may have mixed case
+    expect(slug).not.toContain('&');
+    expect(slug).not.toContain('#');
+    expect(slug).not.toContain(' ');
+    // Base part should be lowercase, suffix is nanoid (alphanumeric + hyphens)
+    expect(slug).toMatch(/^[a-z0-9-]+-[A-Za-z0-9_-]{6}$/);
   });
 
   it('handles single word input', () => {

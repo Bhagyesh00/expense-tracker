@@ -249,7 +249,7 @@ export default function NotificationsPage() {
     mutationFn: async (id: string) => {
       const { error } = await client
         .from("notifications")
-        .update({ read_at: new Date().toISOString() } as any)
+        .update({ is_read: true } as any)
         .eq("id", id);
       if (error) throw error;
     },
@@ -273,9 +273,9 @@ export default function NotificationsPage() {
       if (!userId) return;
       const { error } = await client
         .from("notifications")
-        .update({ read_at: new Date().toISOString() } as any)
+        .update({ is_read: true } as any)
         .eq("user_id", userId)
-        .is("read_at", null);
+        .eq("is_read", false);
       if (error) throw error;
     },
     onSuccess: () => {

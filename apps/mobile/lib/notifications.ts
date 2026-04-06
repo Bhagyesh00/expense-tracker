@@ -108,7 +108,7 @@ export async function savePushToken(
         push_token: token,
         platform: Platform.OS,
         updated_at: new Date().toISOString(),
-      },
+      } as any,
       {
         onConflict: "user_id,platform",
       }
