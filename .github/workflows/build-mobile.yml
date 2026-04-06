@@ -1,0 +1,187 @@
+name: Build Mobile
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/mobile/**'
+      - 'packages/**'
+      - '.github/workflows/build-mobile.yml'
+      - 'pnpm-lock.yaml'
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: Platform to build
+        required: true
+        default: android
+        type: choice
+        options:
+          - android
+          - ios
+          - all
+      profile:
+        description: Build profile
+        required: true
+        default: preview
+        type: choice
+        options:
+          - development
+          - preview
+          - production
+
+concurrency:
+  group: build-mobile-${{ github.ref }}-${{ inputs.platform || 'android' }}-${{ inputs.profile || 'preview' }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: EAS Build (${{ inputs.platform || 'android' }} / ${{ inputs.profile || 'preview' }})
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: echo "STORE_PATH=$(pnpm store path)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache pnpm store
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      # expo/expo-github-action installs Expo CLI + EAS CLI and handles auth
+      - name: Setup Expo and EAS
+        uses: expo/expo-github-action@v8
+        with:
+          expo-version: latest
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # ------------------------------------------------------------------
+      # Android build
+      # ------------------------------------------------------------------
+      - name: Build Android (${{ inputs.profile || 'preview' }})
+        if: ${{ inputs.platform == 'android' || inputs.platform == 'all' || github.event_name == 'push' }}
+        id: build-android
+        working-directory: apps/mobile
+        run: |
+          eas build \
+            --platform android \
+            --profile ${{ inputs.profile || 'preview' }} \
+            --non-interactive \
+            --json \
+            --no-wait=false \
+            | tee /tmp/eas-android.json
+
+          # Extract artifact URL from EAS output
+          ARTIFACT_URL=$(cat /tmp/eas-android.json | python3 -c "
+          import sys, json
+          data = json.load(sys.stdin)
+          builds = data if isinstance(data, list) else [data]
+          for b in builds:
+            url = b.get('artifacts', {}).get('buildUrl') or b.get('buildUrl', '')
+            if url:
+              print(url)
+              break
+          " 2>/dev/null || echo "")
+          echo "artifact-url=$ARTIFACT_URL" >> "$GITHUB_OUTPUT"
+        env:
+          EXPO_PUBLIC_SUPABASE_URL: ${{ secrets.EXPO_PUBLIC_SUPABASE_URL }}
+          EXPO_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.EXPO_PUBLIC_SUPABASE_ANON_KEY }}
+          EXPO_PUBLIC_PROJECT_ID: ${{ secrets.EXPO_PUBLIC_PROJECT_ID }}
+
+      # ------------------------------------------------------------------
+      # iOS build (runs only when explicitly requested — requires Apple certs)
+      # ------------------------------------------------------------------
+      - name: Build iOS (${{ inputs.profile || 'preview' }})
+        if: ${{ inputs.platform == 'ios' || inputs.platform == 'all' }}
+        id: build-ios
+        working-directory: apps/mobile
+        run: |
+          eas build \
+            --platform ios \
+            --profile ${{ inputs.profile || 'preview' }} \
+            --non-interactive \
+            --json \
+            --no-wait=false \
+            | tee /tmp/eas-ios.json
+
+          ARTIFACT_URL=$(cat /tmp/eas-ios.json | python3 -c "
+          import sys, json
+          data = json.load(sys.stdin)
+          builds = data if isinstance(data, list) else [data]
+          for b in builds:
+            url = b.get('artifacts', {}).get('buildUrl') or b.get('buildUrl', '')
+            if url:
+              print(url)
+              break
+          " 2>/dev/null || echo "")
+          echo "artifact-url=$ARTIFACT_URL" >> "$GITHUB_OUTPUT"
+        env:
+          EXPO_PUBLIC_SUPABASE_URL: ${{ secrets.EXPO_PUBLIC_SUPABASE_URL }}
+          EXPO_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.EXPO_PUBLIC_SUPABASE_ANON_KEY }}
+          EXPO_PUBLIC_PROJECT_ID: ${{ secrets.EXPO_PUBLIC_PROJECT_ID }}
+
+      # ------------------------------------------------------------------
+      # Comment build links on PRs associated with this commit
+      # ------------------------------------------------------------------
+      - name: Comment build links on related PRs
+        if: success()
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const sha = context.sha;
+            const androidUrl = '${{ steps.build-android.outputs.artifact-url }}';
+            const iosUrl = '${{ steps.build-ios.outputs.artifact-url }}';
+            const profile = '${{ inputs.profile || 'preview' }}';
+            const platform = '${{ inputs.platform || 'android' }}';
+
+            const lines = [
+              `### Mobile build complete — \`${profile}\` / \`${platform}\``,
+              '',
+              `Commit: \`${sha.slice(0, 7)}\``,
+              '',
+            ];
+            if (androidUrl) lines.push(`**Android:** [Download APK / AAB](${androidUrl})`);
+            if (iosUrl) lines.push(`**iOS:** [Download IPA](${iosUrl})`);
+            if (!androidUrl && !iosUrl) lines.push('Build submitted to EAS — check https://expo.dev for status.');
+
+            const body = lines.join('\n');
+
+            const { data: prs } = await github.rest.repos.listPullRequestsAssociatedWithCommit({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              commit_sha: sha,
+            });
+
+            for (const pr of prs) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: pr.number,
+                body,
+              });
+            }

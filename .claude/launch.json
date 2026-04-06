@@ -1,0 +1,35 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "Web (Next.js)",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--filter", "@expenseflow/web", "dev"],
+      "port": 3000
+    },
+    {
+      "name": "Mobile (Expo / Metro)",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--filter", "@expenseflow/mobile", "dev"],
+      "port": 8081
+    },
+    {
+      "name": "All Apps (Turborepo)",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["dev"],
+      "port": 3000
+    },
+    {
+      "name": "Supabase Studio (local)",
+      "runtimeExecutable": "supabase",
+      "runtimeArgs": ["start"],
+      "port": 54323
+    },
+    {
+      "name": "Supabase API (local)",
+      "runtimeExecutable": "supabase",
+      "runtimeArgs": ["start"],
+      "port": 54321
+    }
+  ]
+}

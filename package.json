@@ -1,0 +1,30 @@
+{
+  "name": "expenseflow",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "turbo dev",
+    "dev:web": "turbo dev --filter=@expenseflow/web",
+    "dev:mobile": "turbo dev --filter=@expenseflow/mobile",
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "typecheck": "turbo typecheck",
+    "test": "turbo test",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md}\"",
+    "db:gen-types": "supabase gen types typescript --local > packages/types/src/database.ts",
+    "db:migrate": "supabase db push",
+    "db:seed": "supabase db seed",
+    "db:reset": "supabase db reset",
+    "clean": "turbo clean && rm -rf node_modules"
+  },
+  "devDependencies": {
+    "turbo": "^2.3.0",
+    "prettier": "^3.4.0",
+    "@changesets/cli": "^2.27.0"
+  },
+  "packageManager": "pnpm@10.33.0",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
