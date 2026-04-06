@@ -56,7 +56,7 @@ interface ExpenseRow {
   amount: number;
   description: string;
   category_id: string | null;
-  date: string;
+  expense_date: string;
   type: "expense" | "income";
 }
 
@@ -71,7 +71,7 @@ interface RecurringExpenseRow {
 interface PendingPaymentRow {
   id: string;
   amount: number;
-  settled_amount: number;
+  paid_amount: number;
   due_date: string | null;
   direction: "give" | "receive";
   category_id: string | null;
@@ -366,10 +366,10 @@ Deno.serve(async (req: Request) => {
 
     const { data: expenses, error: expensesError } = await admin
       .from("expenses")
-      .select("id, amount, description, category_id, date, type")
+      .select("id, amount, description, category_id, expense_date, type")
       .eq("workspace_id", workspaceId)
-      .gte("date", threeMonthsAgo.toISOString().split("T")[0]!)
-      .order("date", { ascending: false })
+      .gte("expense_date", threeMonthsAgo.toISOString().split("T")[0]!)
+      .order("expense_date", { ascending: false })
       .limit(1000);
 
     if (expensesError) throw expensesError;
@@ -388,7 +388,7 @@ Deno.serve(async (req: Request) => {
 
     const { data: pendingPayments } = await admin
       .from("pending_payments")
-      .select("id, amount, settled_amount, due_date, direction, category_id")
+      .select("id, amount, paid_amount, due_date, direction, category_id")
       .eq("workspace_id", workspaceId)
       .in("status", ["pending", "partial"])
       .lte("due_date", forecastEnd.toISOString().split("T")[0]!);
@@ -413,7 +413,7 @@ Deno.serve(async (req: Request) => {
     // Transform to forecast inputs
     const dailyExpenses: DailyExpense[] = ((expenses ?? []) as ExpenseRow[]).map(
       (e) => ({
-        date: e.date,
+        date: e.expense_date,
         amount: e.amount,
         categoryId: e.category_id,
         type: e.type as "expense" | "income",
@@ -431,7 +431,7 @@ Deno.serve(async (req: Request) => {
 
     const pendingInputs = ((pendingPayments ?? []) as PendingPaymentRow[]).map(
       (p) => ({
-        amount: p.amount - (p.settled_amount ?? 0),
+        amount: p.amount - (p.paid_amount ?? 0),
         dueDate: p.due_date,
         direction: p.direction,
       }),

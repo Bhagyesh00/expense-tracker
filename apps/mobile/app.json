@@ -15,7 +15,9 @@
       "resizeMode": "contain",
       "backgroundColor": "#0F172A"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.expenseflow.app",
@@ -27,13 +29,15 @@
         "NSFaceIDUsageDescription": "ExpenseFlow uses Face ID to secure your financial data.",
         "NSUserNotificationsUsageDescription": "ExpenseFlow sends reminders for pending payments and budget alerts.",
         "NSLocationWhenInUseUsageDescription": "ExpenseFlow can use your location to auto-tag expenses.",
-        "UIBackgroundModes": ["fetch", "remote-notification"]
+        "UIBackgroundModes": [
+          "fetch",
+          "remote-notification"
+        ]
       }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
-        "monochromeImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#0F172A"
       },
       "package": "com.expenseflow.app",
@@ -49,7 +53,8 @@
         "android.permission.ACCESS_NETWORK_STATE",
         "android.permission.RECEIVE_BOOT_COMPLETED",
         "android.permission.VIBRATE",
-        "android.permission.POST_NOTIFICATIONS"
+        "android.permission.POST_NOTIFICATIONS",
+        "android.permission.RECORD_AUDIO"
       ],
       "googleServicesFile": "./google-services.json"
     },
@@ -80,7 +85,9 @@
           "icon": "./assets/images/notification-icon.png",
           "color": "#6366F1",
           "defaultChannel": "default",
-          "sounds": ["./assets/sounds/notification.wav"]
+          "sounds": [
+            "./assets/sounds/notification.wav"
+          ]
         }
       ],
       [
@@ -89,27 +96,23 @@
           "faceIDPermission": "Allow ExpenseFlow to use Face ID to secure your data."
         }
       ],
-      [
-        "expo-splash-screen",
-        {
-          "image": "./assets/images/splash.png",
-          "resizeMode": "contain",
-          "backgroundColor": "#0F172A"
-        }
-      ]
+      "expo-splash-screen"
     ],
     "experiments": {
       "typedRoutes": true
     },
     "extra": {
       "eas": {
-        "projectId": ""
+        "projectId": "7b317a87-8c1d-4ac6-8980-9c0956687e19"
+      },
+      "router": {
+        "origin": false
       }
     },
     "updates": {
       "fallbackToCacheTimeout": 0,
-      "url": "https://u.expo.dev/your-project-id"
+      "url": "https://u.expo.dev/7b317a87-8c1d-4ac6-8980-9c0956687e19"
     },
-    "owner": "your-expo-username"
+    "owner": "bhagyesh00"
   }
 }

@@ -20,7 +20,7 @@ const OVERDUE_GRACE_DAYS = 3;
 
 interface ReminderStage {
   stage: number;
-  type: "payment_reminder" | "payment_reminder" | "overdue_payment";
+  type: "payment_reminder" | "overdue_payment";
   title: string;
   body: string;
 }

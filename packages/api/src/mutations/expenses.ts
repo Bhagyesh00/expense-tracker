@@ -119,7 +119,7 @@ export async function createExpense(
       recurrence_interval: input.recurrence_interval ?? null,
       recurrence_end_date: input.recurrence_end_date ?? null,
       parent_recurring_id: input.parent_recurring_id ?? null,
-      is_split: input.is_split ?? (splits && splits.length > 0) ?? false,
+      is_split: input.is_split ?? !!(splits && splits.length > 0),
       split_group_id: input.split_group_id ?? null,
       split_method: input.split_method ?? null,
     })
