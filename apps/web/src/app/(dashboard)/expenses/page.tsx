@@ -154,7 +154,7 @@ export default function ExpensesPage() {
     }
     const headers = ["Date", "Description", "Category", "Type", "Amount", "Currency", "Tags", "Notes"];
     const rows = expenses.map((e) => [
-      e.date,
+      e.expense_date,
       `"${e.description.replace(/"/g, '""')}"`,
       e.categories?.name ?? "",
       e.type,

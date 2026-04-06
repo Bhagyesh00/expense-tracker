@@ -395,7 +395,7 @@ export function useDuplicateCheck({
         id: e.id,
         amount: e.amount,
         description: e.description,
-        date: e.expense_date ?? e.date,
+        date: e.expense_date,
       }));
 
       return detectDuplicate(expense, recentInputs);

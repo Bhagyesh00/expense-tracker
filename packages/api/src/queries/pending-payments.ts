@@ -14,7 +14,7 @@ export interface PendingPaymentRow {
   user_id: string;
   contact_id: string;
   direction: string;
-  amount: number;
+  total_amount: number;
   paid_amount: number;
   currency: string;
   description: string | null;
@@ -145,11 +145,11 @@ export async function getContactLedger(
 
   const totalGive = typedPayments
     .filter((p) => p.direction === 'give')
-    .reduce((sum, p) => sum + p.amount - p.paid_amount, 0);
+    .reduce((sum, p) => sum + p.total_amount - p.paid_amount, 0);
 
   const totalReceive = typedPayments
     .filter((p) => p.direction === 'receive')
-    .reduce((sum, p) => sum + p.amount - p.paid_amount, 0);
+    .reduce((sum, p) => sum + p.total_amount - p.paid_amount, 0);
 
   return {
     contact: contact as { id: string; name: string; email: string | null },

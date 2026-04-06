@@ -268,7 +268,7 @@ export function ContactLedger({
                       )}
                     >
                       {isReceive ? "+" : "-"}
-                      {formatCurrency(payment.amount, payment.currency)}
+                      {formatCurrency(payment.total_amount, payment.currency)}
                     </span>
                     <span
                       className={cn(

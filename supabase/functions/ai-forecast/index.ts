@@ -60,21 +60,19 @@ interface ExpenseRow {
   type: "expense" | "income";
 }
 
-interface RecurringExpenseRow {
+interface RecurringTemplateRow {
   id: string;
   amount: number;
-  category_id: string | null;
   recurrence_interval: string;
-  next_due_date: string | null;
+  next_due_date: string;
 }
 
 interface PendingPaymentRow {
   id: string;
-  amount: number;
+  total_amount: number;
   paid_amount: number;
   due_date: string | null;
   direction: "give" | "receive";
-  category_id: string | null;
 }
 
 interface CategoryRow {
@@ -84,10 +82,9 @@ interface CategoryRow {
 
 interface BudgetRow {
   id: string;
-  name: string;
   amount: number;
-  spent: number;
   category_id: string | null;
+  period: string;
 }
 
 interface GeminiGenerateRequest {
@@ -158,7 +155,6 @@ function forecastCashFlow(
   );
 
   const currentTotal = recentExpenses.reduce((s, e) => s + e.amount, 0);
-  const currentIncome = recentIncome.reduce((s, e) => s + e.amount, 0);
 
   // Weighted daily average
   const dailyAvgExpense = calculateWeightedDailyAverage(recentExpenses, 30);
@@ -368,19 +364,20 @@ Deno.serve(async (req: Request) => {
       .from("expenses")
       .select("id, amount, description, category_id, expense_date, type")
       .eq("workspace_id", workspaceId)
+      .is("deleted_at", null)
+      .eq("is_voided", false)
       .gte("expense_date", threeMonthsAgo.toISOString().split("T")[0]!)
       .order("expense_date", { ascending: false })
       .limit(1000);
 
     if (expensesError) throw expensesError;
 
-    // Fetch recurring expenses
+    // Fetch active recurring payment templates
     const { data: recurring } = await admin
-      .from("expenses")
-      .select("id, amount, category_id, recurrence_interval, next_due_date")
+      .from("recurring_payment_templates")
+      .select("id, amount, recurrence_interval, next_due_date")
       .eq("workspace_id", workspaceId)
-      .eq("is_recurring", true)
-      .not("next_due_date", "is", null);
+      .eq("is_active", true);
 
     // Fetch pending payments (upcoming)
     const forecastEnd = new Date();
@@ -388,7 +385,7 @@ Deno.serve(async (req: Request) => {
 
     const { data: pendingPayments } = await admin
       .from("pending_payments")
-      .select("id, amount, paid_amount, due_date, direction, category_id")
+      .select("id, total_amount, paid_amount, due_date, direction")
       .eq("workspace_id", workspaceId)
       .in("status", ["pending", "partial"])
       .lte("due_date", forecastEnd.toISOString().split("T")[0]!);
@@ -402,7 +399,7 @@ Deno.serve(async (req: Request) => {
     // Fetch active budgets
     const { data: budgets } = await admin
       .from("budgets")
-      .select("id, name, amount, spent, category_id")
+      .select("id, amount, category_id, period")
       .eq("workspace_id", workspaceId)
       .eq("is_active", true);
 
@@ -420,18 +417,18 @@ Deno.serve(async (req: Request) => {
       }),
     );
 
-    const recurringInputs = ((recurring ?? []) as RecurringExpenseRow[])
-      .filter((r) => r.next_due_date)
-      .map((r) => ({
+    const recurringInputs = ((recurring ?? []) as RecurringTemplateRow[]).map(
+      (r) => ({
         amount: r.amount,
-        categoryId: r.category_id,
-        nextDueDate: r.next_due_date!,
+        categoryId: null as string | null,
+        nextDueDate: r.next_due_date,
         interval: r.recurrence_interval,
-      }));
+      }),
+    );
 
     const pendingInputs = ((pendingPayments ?? []) as PendingPaymentRow[]).map(
       (p) => ({
-        amount: p.amount - (p.paid_amount ?? 0),
+        amount: p.total_amount - (p.paid_amount ?? 0),
         dueDate: p.due_date,
         direction: p.direction,
       }),

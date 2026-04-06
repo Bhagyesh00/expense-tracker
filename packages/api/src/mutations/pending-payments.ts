@@ -207,7 +207,7 @@ export async function sendReminder(
 
   const typedPayment = payment as any;
   const contactName = typedPayment.contacts?.name ?? 'a contact';
-  const remaining = typedPayment.amount - (typedPayment.paid_amount ?? 0);
+  const remaining = typedPayment.total_amount - (typedPayment.paid_amount ?? 0);
   const direction = typedPayment.direction === 'give' ? 'to' : 'from';
 
   // Insert a reminder notification directly into the notifications table

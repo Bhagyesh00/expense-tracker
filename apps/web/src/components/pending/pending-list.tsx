@@ -211,7 +211,7 @@ export function PendingList({
           cmp = (a.contacts?.name ?? "").localeCompare(b.contacts?.name ?? "");
           break;
         case "amount":
-          cmp = a.amount - b.amount;
+          cmp = a.total_amount - b.total_amount;
           break;
         case "dueDate":
           cmp =
@@ -327,9 +327,9 @@ export function PendingList({
                 payment.status !== "settled" &&
                 payment.status !== "cancelled";
               const progressPercent =
-                payment.amount > 0
+                payment.total_amount > 0
                   ? Math.min(
-                      (payment.paid_amount / payment.amount) * 100,
+                      (payment.paid_amount / payment.total_amount) * 100,
                       100,
                     )
                   : 0;
@@ -387,7 +387,7 @@ export function PendingList({
                           isReceive ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400",
                         )}
                       >
-                        {formatCurrency(payment.amount, payment.currency)}
+                        {formatCurrency(payment.total_amount, payment.currency)}
                       </span>
                       {payment.paid_amount > 0 && payment.status !== "settled" && (
                         <div className="space-y-0.5">
@@ -465,9 +465,9 @@ export function PendingList({
             payment.status !== "settled" &&
             payment.status !== "cancelled";
           const progressPercent =
-            payment.amount > 0
+            payment.total_amount > 0
               ? Math.min(
-                  (payment.paid_amount / payment.amount) * 100,
+                  (payment.paid_amount / payment.total_amount) * 100,
                   100,
                 )
               : 0;
@@ -503,7 +503,7 @@ export function PendingList({
                       )}
                     >
                       {isReceive ? "+" : "-"}
-                      {formatCurrency(payment.amount, payment.currency)}
+                      {formatCurrency(payment.total_amount, payment.currency)}
                     </span>
                   </div>
                   <div className="flex items-center justify-between mt-1">

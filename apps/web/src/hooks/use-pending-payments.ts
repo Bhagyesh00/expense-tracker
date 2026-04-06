@@ -137,7 +137,7 @@ export function usePendingSummary() {
 
     for (const p of payments) {
       if (p.status === "cancelled" || p.status === "settled") continue;
-      const remaining = p.amount - p.paid_amount;
+      const remaining = p.total_amount - p.paid_amount;
       if (p.direction === "give") {
         totalGive += remaining;
       } else {

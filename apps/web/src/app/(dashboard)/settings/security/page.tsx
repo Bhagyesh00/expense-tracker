@@ -27,9 +27,6 @@ import { cn } from "@/lib/cn";
 import { createBrowserClient } from "@/lib/supabase/client";
 import { TOTPSetupModal } from "@/components/auth/totp-setup";
 
-export const metadata = {
-  title: "Security Settings",
-};
 
 const changePasswordSchema = z
   .object({

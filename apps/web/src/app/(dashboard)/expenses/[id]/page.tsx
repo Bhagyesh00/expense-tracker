@@ -253,7 +253,7 @@ export default function ExpenseDetailPage() {
             categoryId: expense.category_id ?? "",
             description: expense.description,
             notes: expense.notes ?? "",
-            expenseDate: new Date(expense.date),
+            expenseDate: new Date(expense.expense_date),
             tags: expense.tags ?? [],
             receiptUrl: expense.receipt_url,
             isRecurring: expense.is_recurring,
@@ -424,7 +424,7 @@ export default function ExpenseDetailPage() {
           <div>
             <p className="text-xs text-muted-foreground">Date</p>
             <p className="text-sm font-medium text-foreground">
-              {new Date(expense.date).toLocaleDateString("en-US", {
+              {new Date(expense.expense_date).toLocaleDateString("en-US", {
                 weekday: "long",
                 year: "numeric",
                 month: "long",

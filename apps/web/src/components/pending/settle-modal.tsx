@@ -46,7 +46,7 @@ export function SettleModal({
 }: SettleModalProps) {
   const { formatCurrency } = useFormatCurrency();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const remaining = payment.amount - payment.paid_amount;
+  const remaining = payment.total_amount - payment.paid_amount;
   const isReceive = payment.direction === "receive";
   const contactName = payment.contacts?.name ?? "Unknown";
 
@@ -127,7 +127,7 @@ export function SettleModal({
           <div className="flex justify-between text-sm">
             <span className="text-muted-foreground">Total Amount</span>
             <span className="font-medium text-foreground">
-              {formatCurrency(payment.amount, payment.currency)}
+              {formatCurrency(payment.total_amount, payment.currency)}
             </span>
           </div>
           <div className="flex justify-between text-sm">

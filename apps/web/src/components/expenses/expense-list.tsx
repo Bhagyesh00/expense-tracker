@@ -163,7 +163,7 @@ export function ExpenseList({
       let cmp = 0;
       switch (sortField) {
         case "date":
-          cmp = new Date(a.date).getTime() - new Date(b.date).getTime();
+          cmp = new Date(a.expense_date).getTime() - new Date(b.expense_date).getTime();
           break;
         case "description":
           cmp = a.description.localeCompare(b.description);
@@ -318,7 +318,7 @@ export function ExpenseList({
                     />
                   </td>
                   <td className="px-4 py-3 text-sm text-foreground whitespace-nowrap">
-                    {getRelativeDate(expense.date)}
+                    {getRelativeDate(expense.expense_date)}
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
@@ -396,7 +396,7 @@ export function ExpenseList({
                   {expense.description}
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  {getRelativeDate(expense.date)}
+                  {getRelativeDate(expense.expense_date)}
                   {expense.categories && ` \u00B7 ${expense.categories.name}`}
                 </p>
               </div>

@@ -20,9 +20,6 @@ import { cn } from "@/lib/cn";
 import { createBrowserClient } from "@/lib/supabase/client";
 import { useUIStore } from "@/stores/ui-store";
 
-export const metadata = {
-  title: "Tax Export",
-};
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 

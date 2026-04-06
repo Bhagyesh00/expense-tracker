@@ -40,9 +40,6 @@ import {
 } from "@/hooks/use-net-worth";
 import { useBlurAmount } from "@/hooks/use-privacy";
 
-export const metadata = {
-  title: "Net Worth",
-};
 
 const assetSchema = z.object({
   name: z.string().min(1, "Name is required"),

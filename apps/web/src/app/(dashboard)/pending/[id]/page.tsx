@@ -148,10 +148,10 @@ export default function PendingPaymentDetailPage() {
 
   const isReceive = payment.direction === "receive";
   const contactName = payment.contacts?.name ?? "Unknown";
-  const remaining = payment.amount - payment.paid_amount;
+  const remaining = payment.total_amount - payment.paid_amount;
   const progressPercent =
-    payment.amount > 0
-      ? Math.min((payment.paid_amount / payment.amount) * 100, 100)
+    payment.total_amount > 0
+      ? Math.min((payment.paid_amount / payment.total_amount) * 100, 100)
       : 0;
   const isSettled = payment.status === "settled";
   const isCancelled = payment.status === "cancelled";
@@ -261,7 +261,7 @@ export default function PendingPaymentDetailPage() {
                     : "text-red-600 dark:text-red-400",
                 )}
               >
-                {formatCurrency(payment.amount, payment.currency)}
+                {formatCurrency(payment.total_amount, payment.currency)}
               </p>
             </div>
 
@@ -339,7 +339,7 @@ export default function PendingPaymentDetailPage() {
           <div className="rounded-xl border border-border bg-card p-6">
             <PaymentTimeline
               records={payment.payment_records ?? []}
-              totalAmount={payment.amount}
+              totalAmount={payment.total_amount}
               currency={payment.currency}
               createdAt={payment.created_at}
               direction={payment.direction}

@@ -78,7 +78,7 @@ export default function ContactsPage() {
       let lastActivity = contact.created_at;
 
       for (const p of contactPayments) {
-        const remaining = p.amount - p.paid_amount;
+        const remaining = p.total_amount - p.paid_amount;
         if (p.status === "settled") continue;
         if (p.direction === "receive") {
           netBalance += remaining;

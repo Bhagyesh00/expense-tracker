@@ -96,7 +96,15 @@
           "faceIDPermission": "Allow ExpenseFlow to use Face ID to secure your data."
         }
       ],
-      "expo-splash-screen"
+      "expo-splash-screen",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "kotlinVersion": "1.9.25"
+          }
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

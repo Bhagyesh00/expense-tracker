@@ -411,7 +411,7 @@ export async function bulkExportExpenses(
   const rows = (data ?? []) as unknown as ExpenseRow[];
 
   return rows.map((row) => ({
-    date: row.expense_date ?? row.date,
+    date: row.expense_date,
     type: row.type,
     description: row.description,
     category: row.categories?.name ?? 'Uncategorized',

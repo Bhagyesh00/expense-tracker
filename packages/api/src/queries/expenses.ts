@@ -44,7 +44,6 @@ export interface ExpenseRow {
   location: string | null;
   latitude: number | null;
   longitude: number | null;
-  date: string;
   expense_date: string;
   tags: string[] | null;
   is_recurring: boolean;
@@ -276,7 +275,7 @@ export async function getExpensesByDateGrouped(
   const groupMap = new Map<string, ExpenseRow[]>();
 
   for (const row of rows) {
-    const dateKey = row.expense_date ?? row.date;
+    const dateKey = row.expense_date;
     const existing = groupMap.get(dateKey);
     if (existing) {
       existing.push(row);

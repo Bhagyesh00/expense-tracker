@@ -437,7 +437,7 @@ export function useSmartDefaults({
       description: e.description,
       category_id: e.category_id,
       // Normalize: expense_date takes precedence over date
-      date: (e as unknown as Record<string, unknown>)['expense_date'] as string ?? e.date,
+      date: e.expense_date,
     }));
 
     return getSmartDefaults(hour, dayOfWeek, recentInputs);
@@ -474,8 +474,7 @@ export function useDuplicateCheck({
         id: e.id,
         amount: e.amount,
         description: e.description,
-        date:
-          (e as unknown as Record<string, unknown>)['expense_date'] as string ?? e.date,
+        date: e.expense_date,
       }));
 
       return detectDuplicate(expense, recentInputs);

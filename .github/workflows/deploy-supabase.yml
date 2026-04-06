@@ -72,8 +72,7 @@ jobs:
           supabase secrets set \
             GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }} \
             GROQ_API_KEY=${{ secrets.GROQ_API_KEY }} \
-            OPEN_EXCHANGE_RATES_APP_ID=${{ secrets.OPEN_EXCHANGE_RATES_APP_ID }} \
-            SUPABASE_SERVICE_ROLE_KEY=${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+            OPEN_EXCHANGE_RATES_APP_ID=${{ secrets.OPEN_EXCHANGE_RATES_APP_ID }}
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
 

@@ -44,11 +44,11 @@ export function SmartSettlement({
         (p) =>
           p.status !== "settled" &&
           p.status !== "cancelled" &&
-          p.amount - p.paid_amount > 0,
+          p.total_amount - p.paid_amount > 0,
       )
       .map((p) => {
         const contactName = p.contacts?.name ?? "Unknown";
-        const remaining = p.amount - p.paid_amount;
+        const remaining = p.total_amount - p.paid_amount;
 
         if (p.direction === "give") {
           // You owe them

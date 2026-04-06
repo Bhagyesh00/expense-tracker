@@ -21,9 +21,6 @@ import { cn } from "@/lib/cn";
 import { createBrowserClient } from "@/lib/supabase/client";
 import { usePrivateMode } from "@/hooks/use-privacy";
 
-export const metadata = {
-  title: "Data & Privacy",
-};
 
 type DeleteStep = "idle" | "warn" | "confirm" | "authenticate" | "deleting";
 
