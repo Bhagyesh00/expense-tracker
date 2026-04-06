@@ -360,7 +360,7 @@ Deno.serve(async (req) => {
     }
 
     // Redirect to app with token
-    const appUrl = Deno.env.get("APP_URL") ?? "http://localhost:3000";
+    const appUrl = Deno.env.get("APP_URL") ?? "https://expense-reducer.vercel.app";
     const redirectUrl = `${appUrl}/api/auth/callback?token_hash=${(session.properties as any)?.hashed_token}&type=magiclink`;
 
     return new Response(null, {

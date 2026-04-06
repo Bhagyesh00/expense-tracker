@@ -17,6 +17,7 @@
  */
 
 const ALLOWED_ORIGINS = [
+  "https://expense-reducer.vercel.app",
   "http://localhost:3000",
   "http://localhost:8081",
   "exp://localhost:8081",

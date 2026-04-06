@@ -37,9 +37,10 @@ file_size_limit = "50MiB"
 
 [auth]
 enabled = true
-site_url = "http://localhost:3000"
+site_url = "https://expense-reducer.vercel.app"
 additional_redirect_urls = [
   "http://localhost:3000",
+  "https://expense-reducer.vercel.app",
   "exp://localhost:8081",
   "expenseflow://auth/callback",
 ]

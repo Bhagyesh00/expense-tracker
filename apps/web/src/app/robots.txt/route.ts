@@ -8,7 +8,7 @@ export const dynamic = "force-static";
 
 export function GET(): NextResponse {
   const appUrl =
-    process.env.NEXT_PUBLIC_APP_URL ?? "https://expenseflow.vercel.app";
+    process.env.NEXT_PUBLIC_APP_URL ?? "https://expense-reducer.vercel.app";
 
   const body = [
     "User-agent: *",

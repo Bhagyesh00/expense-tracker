@@ -351,7 +351,7 @@ export default function SSOPage() {
               ACS URL (Assertion Consumer Service)
             </p>
             <code className="text-sm text-foreground">
-              https://app.expenseflow.com/api/auth/saml/callback
+              https://expense-reducer.vercel.app/api/auth/saml/callback
             </code>
           </div>
           <div className="rounded-lg bg-muted/50 p-3">
@@ -359,7 +359,7 @@ export default function SSOPage() {
               Entity ID
             </p>
             <code className="text-sm text-foreground">
-              https://app.expenseflow.com
+              https://expense-reducer.vercel.app
             </code>
           </div>
           <div className="rounded-lg bg-muted/50 p-3">
@@ -367,7 +367,7 @@ export default function SSOPage() {
               Sign-on URL
             </p>
             <code className="text-sm text-foreground">
-              https://app.expenseflow.com/api/auth/saml/login
+              https://expense-reducer.vercel.app/api/auth/saml/login
             </code>
           </div>
         </div>

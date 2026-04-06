@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 
 const APP_URL =
-  process.env.NEXT_PUBLIC_APP_URL ?? "https://expenseflow.vercel.app";
+  process.env.NEXT_PUBLIC_APP_URL ?? "https://expense-reducer.vercel.app";
 
 /**
  * Dynamic sitemap for the ExpenseFlow web app.
