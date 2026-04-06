@@ -187,8 +187,7 @@ export function QuickAddExpense() {
                         {...amountField}
                         ref={(e) => {
                           amountField.ref(e);
-                          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                          (inputRef as any).current = e;
+                          (inputRef as React.MutableRefObject<HTMLInputElement | null>).current = e;
                         }}
                         className={cn(
                           "h-14 w-full rounded-xl border bg-background pl-12 pr-4 text-2xl font-bold text-foreground outline-none focus:ring-2 focus:ring-ring",

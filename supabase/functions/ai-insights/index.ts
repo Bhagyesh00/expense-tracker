@@ -48,11 +48,11 @@ interface GeminiGenerateRequest {
 
 const SCHEMA_CONTEXT = `
 Database schema:
-- expenses(id, workspace_id, user_id, category_id, type ['expense'|'income'], amount, currency, description, notes, date, tags, is_recurring, is_split, location, created_at)
-- categories(id, workspace_id, name, icon, color, is_default, sort_order)
+- expenses(id, workspace_id, user_id, category_id, type ['expense'|'income'], amount, currency, description, notes, expense_date, tags, is_recurring, is_split, location, created_at)
+- categories(id, workspace_id, name, icon, color, is_system, sort_order)
 - subcategories(id, category_id, name, icon, sort_order)
-- budgets(id, workspace_id, user_id, category_id, name, amount, spent, currency, period ['weekly'|'monthly'|'quarterly'|'yearly'], start_date, end_date, alert_threshold, is_active)
-- pending_payments(id, workspace_id, user_id, contact_id, direction ['give'|'receive'], amount, settled_amount, currency, status ['pending'|'partial'|'settled'|'overdue'|'cancelled'], description, due_date)
+- budgets(id, workspace_id, user_id, category_id, amount, currency, period ['weekly'|'monthly'|'quarterly'|'yearly'], start_date, end_date, alert_threshold_percent, is_active)
+- pending_payments(id, workspace_id, user_id, contact_id, direction ['give'|'receive'], total_amount, paid_amount, currency, status ['pending'|'partial'|'settled'|'overdue'|'cancelled'], description, due_date, settled_at)
 - contacts(id, workspace_id, name, email, phone)
 - savings_goals(id, workspace_id, user_id, name, target_amount, current_amount, currency, target_date, is_completed)
 `.trim();

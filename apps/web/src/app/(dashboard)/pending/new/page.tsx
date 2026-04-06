@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCreatePending } from "@/hooks/use-pending-payments";
 import { useUIStore } from "@/stores/ui-store";
@@ -8,7 +8,7 @@ import { PendingForm } from "@/components/pending/pending-form";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
-export default function NewPendingPaymentPage() {
+function NewPendingPaymentForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const workspaceId = useUIStore((s) => s.activeWorkspaceId);
@@ -80,5 +80,13 @@ export default function NewPendingPaymentPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function NewPendingPaymentPage() {
+  return (
+    <Suspense>
+      <NewPendingPaymentForm />
+    </Suspense>
   );
 }

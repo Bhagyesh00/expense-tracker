@@ -49,18 +49,16 @@ interface ExpenseRow {
   amount: number;
   description: string;
   category_id: string | null;
-  date: string;
+  expense_date: string;
   type: string;
   created_at: string;
 }
 
 interface BudgetRow {
   id: string;
-  name: string;
   amount: number;
-  spent: number;
   category_id: string | null;
-  alert_threshold: number;
+  alert_threshold_percent: number;
 }
 
 interface CategoryRow {
@@ -189,7 +187,7 @@ function detectVelocitySpikes(
   const now = new Date();
   const threeDaysAgo = new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000);
   const recentExpenses = expenses.filter(
-    (e) => new Date(e.date) >= threeDaysAgo,
+    (e) => new Date(e.expense_date) >= threeDaysAgo,
   );
 
   if (recentExpenses.length === 0) return [];
@@ -228,7 +226,7 @@ function detectDuplicates(expenses: ExpenseRow[]): Anomaly[] {
   const seen = new Set<string>();
 
   const sorted = [...expenses].sort(
-    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+    (a, b) => new Date(b.expense_date).getTime() - new Date(a.expense_date).getTime(),
   );
 
   for (let i = 0; i < sorted.length; i++) {
@@ -236,7 +234,7 @@ function detectDuplicates(expenses: ExpenseRow[]): Anomaly[] {
     for (let j = i + 1; j < sorted.length; j++) {
       const other = sorted[j]!;
       const timeDiff = Math.abs(
-        new Date(current.date).getTime() - new Date(other.date).getTime(),
+        new Date(current.expense_date).getTime() - new Date(other.expense_date).getTime(),
       );
 
       if (timeDiff > 24 * 60 * 60 * 1000) break;
@@ -341,11 +339,13 @@ Deno.serve(async (req: Request) => {
 
     const { data: expenses, error: expensesError } = await admin
       .from("expenses")
-      .select("id, amount, description, category_id, date, type, created_at")
+      .select("id, amount, description, category_id, expense_date, type, created_at")
       .eq("workspace_id", workspaceId)
       .eq("type", "expense")
-      .gte("date", thirtyDaysAgo.toISOString().split("T")[0]!)
-      .order("date", { ascending: false })
+      .is("deleted_at", null)
+      .eq("is_voided", false)
+      .gte("expense_date", thirtyDaysAgo.toISOString().split("T")[0]!)
+      .order("expense_date", { ascending: false })
       .limit(500);
 
     if (expensesError) throw expensesError;
@@ -365,7 +365,7 @@ Deno.serve(async (req: Request) => {
     // Fetch budgets
     const { data: budgets } = await admin
       .from("budgets")
-      .select("id, name, amount, spent, category_id, alert_threshold")
+      .select("id, amount, category_id, alert_threshold_percent")
       .eq("workspace_id", workspaceId)
       .eq("is_active", true);
 
@@ -407,27 +407,44 @@ Deno.serve(async (req: Request) => {
     }
 
     // 2. Budget warning insights
+    // Compute spent per category from expenses
+    const categorySpentMap = new Map<string, number>();
+    for (const exp of expenseList) {
+      if (exp.category_id) {
+        categorySpentMap.set(
+          exp.category_id,
+          (categorySpentMap.get(exp.category_id) ?? 0) + exp.amount,
+        );
+      }
+    }
+
     for (const budget of budgetList) {
+      const spent = budget.category_id
+        ? (categorySpentMap.get(budget.category_id) ?? 0)
+        : expenseList.reduce((s, e) => s + e.amount, 0);
+      const budgetLabel = budget.category_id
+        ? (categoryMap.get(budget.category_id) ?? "Budget")
+        : "Total budget";
       const spentPercent = budget.amount > 0
-        ? (budget.spent / budget.amount) * 100
+        ? (spent / budget.amount) * 100
         : 0;
-      const threshold = budget.alert_threshold ?? 80;
+      const threshold = budget.alert_threshold_percent ?? 80;
 
       if (spentPercent >= 100) {
         insights.push({
           workspace_id: workspaceId,
           user_id: resolvedUserId,
           type: "budget_warning",
-          title: `Budget exceeded: ${budget.name}`,
-          description: `You've exceeded your ${budget.name} budget — spent ₹${budget.spent.toFixed(0)} of ₹${budget.amount.toFixed(0)} (${spentPercent.toFixed(0)}%).`,
+          title: `Budget exceeded: ${budgetLabel}`,
+          description: `You've exceeded your ${budgetLabel} budget — spent ₹${spent.toFixed(0)} of ₹${budget.amount.toFixed(0)} (${spentPercent.toFixed(0)}%).`,
           supporting_data: {
             budgetId: budget.id,
-            budgetName: budget.name,
+            budgetLabel,
             amount: budget.amount,
-            spent: budget.spent,
+            spent,
             spentPercent,
           },
-          recommendation: `Review your ${budget.name} spending and consider adjusting the budget or reducing discretionary expenses.`,
+          recommendation: `Review your ${budgetLabel} spending and consider adjusting the budget or reducing discretionary expenses.`,
           severity: "critical",
           is_dismissed: false,
         });
@@ -436,16 +453,16 @@ Deno.serve(async (req: Request) => {
           workspace_id: workspaceId,
           user_id: resolvedUserId,
           type: "budget_warning",
-          title: `Budget alert: ${budget.name}`,
-          description: `You've used ${spentPercent.toFixed(0)}% of your ${budget.name} budget (₹${budget.spent.toFixed(0)} of ₹${budget.amount.toFixed(0)}).`,
+          title: `Budget alert: ${budgetLabel}`,
+          description: `You've used ${spentPercent.toFixed(0)}% of your ${budgetLabel} budget (₹${spent.toFixed(0)} of ₹${budget.amount.toFixed(0)}).`,
           supporting_data: {
             budgetId: budget.id,
-            budgetName: budget.name,
+            budgetLabel,
             amount: budget.amount,
-            spent: budget.spent,
+            spent,
             spentPercent,
           },
-          recommendation: `You're approaching your ${budget.name} budget limit. Consider slowing down spending in this category.`,
+          recommendation: `You're approaching your ${budgetLabel} budget limit. Consider slowing down spending in this category.`,
           severity: "warning",
           is_dismissed: false,
         });
@@ -526,7 +543,7 @@ function buildHistoricalAverages(
     }
 
     const weekNum = Math.floor(
-      new Date(exp.date).getTime() / (7 * 24 * 60 * 60 * 1000),
+      new Date(exp.expense_date).getTime() / (7 * 24 * 60 * 60 * 1000),
     );
     const bucket = weeklyBuckets.get(catId)!;
     bucket.set(weekNum, (bucket.get(weekNum) ?? 0) + exp.amount);

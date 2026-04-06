@@ -121,13 +121,13 @@ Deno.serve(async (req: Request) => {
 
   const { data: expenses, error: expErr } = await admin
     .from("expenses")
-    .select("id, description, amount, currency, date")
+    .select("id, description, amount, currency, expense_date")
     .eq("workspace_id", workspaceId)
     .eq("user_id", userId)
     .eq("type", "expense")
     .is("deleted_at", null)
-    .gte("date", sinceDate)
-    .order("date", { ascending: true });
+    .gte("expense_date", sinceDate)
+    .order("expense_date", { ascending: true });
 
   if (expErr) {
     return errorResponse(`Failed to fetch expenses: ${expErr.message}`, 500);
@@ -155,7 +155,7 @@ Deno.serve(async (req: Request) => {
     const key = normaliseMerchant(exp.description);
     if (!grouped.has(key)) grouped.set(key, []);
     grouped.get(key)!.push({
-      date: exp.date as string,
+      date: exp.expense_date as string,
       amount: Number(exp.amount),
       currency: exp.currency ?? "INR",
     });

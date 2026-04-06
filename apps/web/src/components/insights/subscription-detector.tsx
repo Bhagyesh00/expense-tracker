@@ -234,6 +234,7 @@ export function SubscriptionDetector({
   }, [subscriptions]);
 
   const blurredTotal = useBlurAmount(Math.round(totalMonthly));
+  const blurredYearly = useBlurAmount(Math.round(totalMonthly * 12));
 
   const handleAddToRecurring = async (sub: DetectedSubscription) => {
     setAddingId(sub.id);
@@ -297,7 +298,7 @@ export function SubscriptionDetector({
               <span>
                 ≈{" "}
                 <span className="font-medium text-foreground">
-                  {useBlurAmount(Math.round(totalMonthly * 12))}
+                  {blurredYearly}
                 </span>{" "}
                 per year
               </span>

@@ -35,8 +35,7 @@ interface CategoryChartProps {
   isLoading: boolean;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function renderActiveShape(props: any) {
+function renderActiveShape(props: Record<string, number | string>) {
   const {
     cx,
     cy,
@@ -50,13 +49,13 @@ function renderActiveShape(props: any) {
   return (
     <g>
       <Sector
-        cx={cx}
-        cy={cy}
-        innerRadius={innerRadius}
-        outerRadius={outerRadius + 6}
-        startAngle={startAngle}
-        endAngle={endAngle}
-        fill={fill}
+        cx={cx as number}
+        cy={cy as number}
+        innerRadius={innerRadius as number}
+        outerRadius={(outerRadius as number) + 6}
+        startAngle={startAngle as number}
+        endAngle={endAngle as number}
+        fill={fill as string}
       />
     </g>
   );
