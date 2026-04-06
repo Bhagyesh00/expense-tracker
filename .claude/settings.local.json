@@ -4,7 +4,8 @@
       "Bash(pnpm -v)",
       "Bash(npm install:*)",
       "Bash(pnpm install:*)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(ls \"apps/web/src/app/\\(dashboard\\)/\")"
     ]
   }
 }
