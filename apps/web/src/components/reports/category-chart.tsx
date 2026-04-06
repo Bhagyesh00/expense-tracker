@@ -35,16 +35,9 @@ interface CategoryChartProps {
   isLoading: boolean;
 }
 
-function renderActiveShape(props: Record<string, number | string>) {
-  const {
-    cx,
-    cy,
-    innerRadius,
-    outerRadius,
-    startAngle,
-    endAngle,
-    fill,
-  } = props;
+function renderActiveShape(props: unknown) {
+  const { cx, cy, innerRadius, outerRadius, startAngle, endAngle, fill } =
+    props as Record<string, number | string>;
 
   return (
     <g>
