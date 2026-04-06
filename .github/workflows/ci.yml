@@ -225,12 +225,5 @@ jobs:
           NEXT_PUBLIC_APP_URL: ${{ secrets.NEXT_PUBLIC_APP_URL || 'https://expenseflow.vercel.app' }}
           NEXT_PUBLIC_APP_NAME: ExpenseFlow
 
-      - name: Upload build artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: web-build-${{ github.sha }}
-          path: |
-            apps/web/.next/
-            !apps/web/.next/cache
-          retention-days: 7
-          if-no-files-found: error
+      - name: Verify build output
+        run: test -d apps/web/.next && echo "Build successful" || exit 1

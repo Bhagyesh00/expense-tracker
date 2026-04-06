@@ -1,21 +1,25 @@
-import { createServerClient } from "@/lib/supabase/server";
+"use client";
+
+import { useEffect, useState } from "react";
+import { createBrowserClient } from "@/lib/supabase/client";
 import { DashboardHome } from "./dashboard-home";
 
-export const metadata = {
-  title: "Dashboard",
-};
+export default function DashboardPage() {
+  const [userName, setUserName] = useState("there");
 
-export default async function DashboardPage() {
-  const supabase = await createServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  useEffect(() => {
+    const supabase = createBrowserClient();
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user) {
+        const name =
+          user.user_metadata?.full_name ||
+          user.user_metadata?.name ||
+          user.email?.split("@")[0] ||
+          "there";
+        setUserName(name);
+      }
+    });
+  }, []);
 
-  const fullName =
-    user?.user_metadata?.full_name ||
-    user?.user_metadata?.name ||
-    user?.email?.split("@")[0] ||
-    "there";
-
-  return <DashboardHome userName={fullName} />;
+  return <DashboardHome userName={userName} />;
 }
